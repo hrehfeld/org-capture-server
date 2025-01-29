@@ -15,6 +15,11 @@ user_password = pathlib.Path('password.txt').read_text().strip()
 
 app = FastAPI()
 
+
+def format_command(cmd):
+    return " ".join(shlex.quote(arg) for arg in cmd)
+
+
 def print_bookmarklet():
     bookmarklet = pathlib.Path("bookmarklet.js").read_text()
     whitespace = re.compile("[\n\\s]+", re.MULTILINE)
@@ -66,7 +71,7 @@ async def capture(password: str, template: str, url: str, title: str, body: str,
     args = urllib.parse.urlencode(args, doseq=True)
     if args:
         cmd = ['xdg-open', f"org-protocol://capture?" + args]
-        print(cmd)
+        print(format_command(cmd))
         subprocess.run(cmd, check=True)
     # return {"message": "Command executed"}
     # a simple html5 webpage that just executes javascript back
