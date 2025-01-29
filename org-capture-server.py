@@ -1,3 +1,4 @@
+#!/bin/python3
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 import subprocess
