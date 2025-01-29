@@ -6,6 +6,8 @@ from pprint import pprint
 import pathlib
 import urllib
 import os
+import shlex
+import re
 
 HOST = "127.0.0.1"
 PORT = 8987
@@ -14,14 +16,21 @@ user_password = pathlib.Path('password.txt').read_text().strip()
 app = FastAPI()
 
 def print_bookmarklet():
-    bookmarklet = pathlib.Path('bookmarklet.js').read_text()
+    bookmarklet = pathlib.Path("bookmarklet.js").read_text()
+    whitespace = re.compile("[\n\\s]+", re.MULTILINE)
+
+    comments = re.compile(r"^\s*//.*$\n", re.MULTILINE)
+    bookmarklet = comments.sub("", bookmarklet)
+
+    bookmarklet = whitespace.sub(" ", bookmarklet)
+
     repls = {
-        os.linesep: ' ',
-        '{HOST}': f"{HOST}:{PORT}",
-        '{PASSWORD}': user_password,
+        "{HOST}": f"{HOST}:{PORT}",
+        "{PASSWORD}": user_password,
     }
     for args in repls.items():
         bookmarklet = bookmarklet.replace(*args)
+
     return bookmarklet
 
 
