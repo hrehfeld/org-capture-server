@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 import subprocess
 from urllib.parse import quote, unquote
 from pprint import pprint
@@ -37,7 +38,8 @@ def convert_html_to_org(html_string: str):
 
     return result.stdout
 
-@app.get("/capture")
+
+@app.get("/capture", response_class=HTMLResponse)
 async def capture(password: str, template: str, url: str, title: str, body: str, request: Request):
     if user_password != password:
         return { "error": 'wrong password' }
@@ -57,7 +59,21 @@ async def capture(password: str, template: str, url: str, title: str, body: str,
         cmd = ['xdg-open', f"org-protocol://capture?" + args]
         print(cmd)
         subprocess.run(cmd, check=True)
-    return {"message": "Command executed"}
+    # return {"message": "Command executed"}
+    # a simple html5 webpage that just executes javascript back
+    return f"""
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Org Capture</title>
+    </head>
+<body>
+        <script>
+            history.back();
+        </script>
+    <a href="javascript:history.back()">Go back</a>
+</body>
+    </html>"""
 
 if __name__ == "__main__":
     print(f''' here's the chrome bookmarklet:
