@@ -12,7 +12,7 @@ import re
 
 HOST = "127.0.0.1"
 PORT = 8987
-user_password = pathlib.Path('password.txt').read_text().strip()
+user_password = pathlib.Path("password.txt").read_text().strip()
 
 app = FastAPI()
 
@@ -57,9 +57,9 @@ def convert_html_to_org(html_string: str):
 @app.get("/capture", response_class=HTMLResponse)
 async def capture(password: str, template: str, url: str, title: str, body: str, request: Request):
     if user_password != password:
-        return { "error": 'wrong password' }
-    body_key = 'body'
-    keys = 'template','url','title', body_key
+        return {"error": "wrong password"}
+    body_key = "body"
+    keys = "template", "url", "title", body_key
     values = template, url, title, body
     args = dict(zip(keys, [v.strip() for v in values]))
     pprint(args)
@@ -67,7 +67,7 @@ async def capture(password: str, template: str, url: str, title: str, body: str,
     if body:
         args[body_key] = convert_html_to_org(body).strip()
     pprint(args)
-    #args = {k: quote(v) for k, v in args.items() if v}
+    # args = {k: quote(v) for k, v in args.items() if v}
     pprint(args)
     args = urllib.parse.urlencode(args, doseq=True)
     if args:
@@ -92,10 +92,14 @@ async def capture(password: str, template: str, url: str, title: str, body: str,
 </body>
     </html>"""
 
+
 if __name__ == "__main__":
-    print(f''' here's the chrome bookmarklet:
+    print(
+        f""" here's the chrome bookmarklet:
 
 {print_bookmarklet()}
-''')
+"""
+    )
     import uvicorn
+
     uvicorn.run(app, host=HOST, port=PORT)
