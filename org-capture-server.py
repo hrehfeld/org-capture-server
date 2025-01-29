@@ -71,7 +71,9 @@ async def capture(password: str, template: str, url: str, title: str, body: str,
     pprint(args)
     args = urllib.parse.urlencode(args, doseq=True)
     if args:
-        cmd = ['xdg-open', f"org-protocol://capture?" + args]
+        cmd = ["xdg-open", f"org-protocol://capture?" + args]
+        # for some reason my mimeo always opens the broken emacsclient.desktop
+        cmd = ["emacsclient", "-c", f"org-protocol://capture?" + args]
         print(format_command(cmd))
         subprocess.run(cmd, check=True)
     # return {"message": "Command executed"}
