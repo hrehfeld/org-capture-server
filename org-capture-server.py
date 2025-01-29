@@ -3,12 +3,17 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 import subprocess
 from urllib.parse import quote, unquote
-from pprint import pprint
+from pprint import pformat
 import pathlib
 import urllib
 import os
 import shlex
 import re
+
+import logging
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 HOST = "127.0.0.1"
 PORT = 8987
@@ -62,19 +67,16 @@ async def capture(password: str, template: str, url: str, title: str, body: str,
     keys = "template", "url", "title", body_key
     values = template, url, title, body
     args = dict(zip(keys, [v.strip() for v in values]))
-    pprint(args)
     body = args.get(body_key)
     if body:
         args[body_key] = convert_html_to_org(body).strip()
-    pprint(args)
     # args = {k: quote(v) for k, v in args.items() if v}
-    pprint(args)
     args = urllib.parse.urlencode(args, doseq=True)
     if args:
         cmd = ["xdg-open", f"org-protocol://capture?" + args]
         # for some reason my mimeo always opens the broken emacsclient.desktop
         cmd = ["emacsclient", "-c", f"org-protocol://capture?" + args]
-        print(format_command(cmd))
+        log.debug(format_command(cmd))
         subprocess.run(cmd, check=True)
     # return {"message": "Command executed"}
     # a simple html5 webpage that just executes javascript back
